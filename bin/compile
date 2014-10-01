@@ -61,9 +61,12 @@ if [ ! -d .maven ]; then
   echo " done"
 fi
 
+CUSTOM_SETTINGS_XML_MVN_OPTION=""
 if [ -f $BUILD_DIR/settings.xml ]; then
   echo -n "----->  Copying project's custom settings.xml..."
-  cp $BUILD_DIR/settings.xml .m2/settings.xml
+  CUSTOM_SETTINGS_XML_LOCATION=$(pwd)/.m2/settings.xml
+  CUSTOM_SETTINGS_XML_MVN_OPTION="--settings $CUSTOM_SETTINGS_XML_LOCATION"
+  cp $BUILD_DIR/settings.xml $CUSTOM_SETTINGS_XML_LOCATION
   echo " done"
 fi
 
@@ -73,7 +76,7 @@ cd $BUILD_DIR
 export MAVEN_OPTS="-Xmx1024m"
 
 # build app
-BUILDCMD="$CACHE_DIR/.maven/bin/mvn -B -Duser.home=$BUILD_DIR -Dmaven.repo.local=$CACHE_DIR/.m2/repository -Dmaven.test.skip=true clean install"
+BUILDCMD="$CACHE_DIR/.maven/bin/mvn -B -Duser.home=$BUILD_DIR -Dmaven.repo.local=$CACHE_DIR/.m2/repository -Dmaven.test.skip=true $CUSTOM_SETTINGS_XML_MVN_OPTION clean install"
 echo "-----> executing $BUILDCMD"
 
 $BUILDCMD 2>&1 | sed -u 's/^/       /'
